@@ -1,9 +1,10 @@
-# Istio with AKS - TLS
+# Istio with AKS - Monitoring
 
 [Back](../README.md)
 
-- [Istio with AKS - TLS](#istio-with-aks---tls)
+- [Istio with AKS - Monitoring](#istio-with-aks---monitoring)
   - [Install Istio addons](#install-istio-addons)
+  - [Create Gateway](#create-gateway)
 
 ---
 
@@ -48,5 +49,13 @@ kubectl -n istio-system get pods | grep -E 'prometheus|grafana|jaeger|kiali'
 # dashboard
 istioctl dashboard kiali       # opens browser to Kiali
 istioctl dashboard grafana     # opens browser to Grafana
-istioctl dashboard prometheus  # 
+istioctl dashboard prometheus  #
+```
+
+---
+
+## Create Gateway
+
+```sh
+kubectl apply -f manifests/istio/monitoring
 ```
