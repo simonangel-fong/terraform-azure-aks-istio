@@ -12,6 +12,11 @@
 ## Create API Application with nginx
 
 ```sh
+export KUBECONFIG=~/kubeconfig
+
+# enable sidercar injection
+kubectl label namespace default istio-injection=enabled --overwrite
+
 # Apply manifests
 kubectl apply -f manifests/web-app
 
@@ -50,7 +55,7 @@ kubectl run curl --rm -it --image=curlimages/curl --restart=Never -- sh -c 'curl
 ## Ingress Test
 
 ```sh
-INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+INGRESS_IP=$(kubectl -n istio-ingress get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo "ingress IP: $INGRESS_IP"
 # ingress IP: 20.121.180.84
 

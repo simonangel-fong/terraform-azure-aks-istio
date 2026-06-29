@@ -10,6 +10,8 @@
 ## Install Istio
 
 ```sh
+export KUBECONFIG=~/kubeconfig
+
 helm repo add istio https://istio-release.storage.googleapis.com/charts
 # "istio" has been added to your repositories
 helm repo update istio
@@ -35,11 +37,7 @@ helm upgrade -i istio-base istio/base -n istio-system --set defaultRevision=defa
 helm upgrade -i istiod istio/istiod -n istio-system --wait
 
 # install istio gateway
-helm upgrade -i istio-ingressgateway istio/gateway -n istio-system -f manifests/istio-gateway/values.yaml --wait
-
-# enable sidercar injection
-kubectl label namespace default istio-injection=enabled --overwrite
-
+helm upgrade -i istio-ingressgateway istio/gateway -n istio-ingress -f manifests/istio/helm/values.yaml --create-namespace --wait
 
 # confirm: control plane + gateway pods are Running
 kubectl -n istio-system get pods
@@ -48,7 +46,7 @@ kubectl -n istio-system get pods
 # istiod-6fdc665455-ztgf5                1/1     Running   0          13m
 
 # Ingress LB has an external IP
-kubectl -n istio-system get svc istio-ingressgateway
+kubectl -n istio-ingress get svc istio-ingressgateway
 # NAME                   TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)                                      AGE
 # istio-ingressgateway   LoadBalancer   10.0.143.10   20.121.180.84   15021:32673/TCP,80:32341/TCP,443:30841/TCP   8m42s
 
@@ -57,7 +55,7 @@ istioctl analyze -n default
 # ✔ No validation issues found when analyzing namespace: default.
 
 # Save the ingress IP for phase 04
-export INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+export INGRESS_IP=$(kubectl -n istio-ingress get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo "ingress IP: $INGRESS_IP"
 # ingress IP: 20.121.180.84
 

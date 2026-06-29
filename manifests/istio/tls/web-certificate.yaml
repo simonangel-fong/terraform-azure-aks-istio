@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: web-tls
-  namespace: istio-system
+  namespace: istio-ingress
 spec:
   secretName: web-tls
   duration: 2160h    # 90d

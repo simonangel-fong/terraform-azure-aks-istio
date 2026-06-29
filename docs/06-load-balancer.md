@@ -11,6 +11,8 @@
 ## Create and deploy new version app
 
 ```sh
+export KUBECONFIG=~/kubeconfig
+
 kubectl apply -f manifests/istio/load-balancer
 # destinationrule.networking.istio.io/web created
 # virtualservice.networking.istio.io/web configured

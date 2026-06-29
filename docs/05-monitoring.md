@@ -11,6 +11,8 @@
 ## Install Istio addons
 
 ```sh
+export KUBECONFIG=~/kubeconfig
+
 ISTIO_VER=1.30
 
 for addon in prometheus grafana jaeger kiali; do

@@ -12,6 +12,8 @@
 ## Install Cert Manger
 
 ```sh
+export KUBECONFIG=~/kubeconfig
+
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 
@@ -70,7 +72,7 @@ kubectl apply -f manifests/web-app
 
 ```sh
 # test
-INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+INGRESS_IP=$(kubectl -n istio-ingress get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 curl -I --resolve web.local:80:$INGRESS_IP http://web.local/
 # HTTP/1.1 301 Moved Permanently

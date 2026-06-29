@@ -1,0 +1,31 @@
+# Traffic mirroring: 100% live -> v1, fire-and-forget shadow -> v2
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: web
+  namespace: default
+spec:
+  hosts:
+    - "web.local"
+  gateways:
+    - web-gateway
+  http:
+    - match:
+        - uri:
+            exact: /
+        - uri:
+            exact: /healthz
+      route:
+        - destination:
+            host: web
+            subset: v1
+            port:
+              number: 80
+          weight: 100
+      mirror:
+        host: web
+        subset: v2
+        port:
+          number: 80
+      mirrorPercentage:
+        value: 100.0

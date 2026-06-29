@@ -126,15 +126,32 @@ Progressive shift from v1 → v2 by editing the `VirtualService` weights:
 
 Internal testers send a header and always land on v2; everyone else gets the 90/10 baseline.
 
-- Re-deploy `web-v1`
-- `VirtualService` with **two ordered `http` rules** — order matters, Istio evaluates top-down:
+- Deploy `web-v1`, `web-v2`
+- `DestinationRule`: subsets `v1`/`v2`
+- `VirtualService`: **two ordered `http` rules**
   1. **Match** `header: x-test: "true"` → 100% to subset `v2`
   2. **Default** (no match) → weighted split **v1 90 / v2 10**
-- Reuses the phase 07 `DestinationRule` (subsets `v1`/`v2`)
 - **Verify**
   - 100 curls **without** the header → ≈ 90 v1 / 10 v2
   - 20 curls **with** `-H "x-test: true"` → 20 × v2, zero v1
   - Kiali Graph (with "Request Distribution") shows two distinct flows from the ingress gateway
+
+---
+
+## Phase 10 — Traffic mirroring (shadowing)
+
+Send 100% of live traffic to v1 (the response the client sees) and **fork a fire-and-forget copy** to v2. Mirrored responses are discarded — clients are unaffected, but v2 sees real production load for testing.
+
+- Deploy `web-v1`, `web-v2`
+- `DestinationRule`: subsets `v1`/`v2` (reused from phase 07)
+- `VirtualService`:
+  - `route` → subset `v1` (weight 100) — serves the client
+  - `mirror` → subset `v2`, `mirrorPercentage.value: 100` — shadow copy
+- **Verify**
+  - Every client response is v1 (`"version":"1.0"`)
+  - `kubectl logs -l version=v2 -c istio-proxy` shows incoming requests on v2 pods
+  - Kiali Graph shows a dashed edge from `web` → `v2` labeled *mirrored*
+  - Grafana: v2 RPS roughly equals v1 RPS, but v1's response codes are what reach the gateway
 
 ---
 
