@@ -113,17 +113,28 @@ Progressive shift from v1 → v2 by editing the `VirtualService` weights:
 1. v1 80 / v2 20
 2. v1 50 / v2 50
 3. v1 0 / v2 100
+4. Decommission v1 deployment once at 100% v2
 
 - **Verify at each step**
   - Curl ratio matches the configured weights
   - Kiali shows the traffic split converging to v2
   - Error rate in Grafana stays flat across the rollout
 
-Optional follow-ups:
+---
 
-- Header-based routing (e.g., `x-canary: true` always to v2) using `VirtualService` match rules
-- `Sleep`/fault injection to test resilience
-- Decommission v1 deployment once at 100% v2
+## Phase 09 — A/B test (header-based routing)
+
+Internal testers send a header and always land on v2; everyone else gets the 90/10 baseline.
+
+- Re-deploy `web-v1`
+- `VirtualService` with **two ordered `http` rules** — order matters, Istio evaluates top-down:
+  1. **Match** `header: x-test: "true"` → 100% to subset `v2`
+  2. **Default** (no match) → weighted split **v1 90 / v2 10**
+- Reuses the phase 07 `DestinationRule` (subsets `v1`/`v2`)
+- **Verify**
+  - 100 curls **without** the header → ≈ 90 v1 / 10 v2
+  - 20 curls **with** `-H "x-test: true"` → 20 × v2, zero v1
+  - Kiali Graph (with "Request Distribution") shows two distinct flows from the ingress gateway
 
 ---
 

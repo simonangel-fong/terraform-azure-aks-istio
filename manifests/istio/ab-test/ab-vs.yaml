@@ -1,0 +1,42 @@
+# A/B test: x-test:true -> v2; otherwise 90:10 (v1:v2)
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: web
+  namespace: default
+spec:
+  hosts:
+    - "web.local"
+  gateways:
+    - web-gateway
+  http:
+    # Rule 1: header-based opt-in -> 100% v2
+    - match:
+        - headers:
+            x-test:
+              exact: "true"
+      route:
+        - destination:
+            host: web
+            subset: v2
+            port:
+              number: 80
+    # Rule 2: default split 90:10
+    - match:
+        - uri:
+            exact: /
+        - uri:
+            exact: /healthz
+      route:
+        - destination:
+            host: web
+            subset: v1
+            port:
+              number: 80
+          weight: 90
+        - destination:
+            host: web
+            subset: v2
+            port:
+              number: 80
+          weight: 10
