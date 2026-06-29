@@ -9,12 +9,13 @@ spec:
   gateways:
     - web-gateway
   http:
-    - match:
+    - match:  # match path
         - uri:
             exact: /
         - uri:
             exact: /healthz
       route:
+        # weighted destination
         - destination:
             host: web
             subset: v1
