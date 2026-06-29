@@ -57,5 +57,5 @@ istioctl dashboard prometheus  #
 ## Create Gateway
 
 ```sh
-kubectl apply -f manifests/istio/monitoring
+kubectl apply -f manifests/istio/monitoring/
 ```

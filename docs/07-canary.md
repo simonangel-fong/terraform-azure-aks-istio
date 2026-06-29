@@ -1,9 +1,37 @@
-## Stable version
+# Istio with AKS - Canary
+
+[Back](../README.md)
+
+- [Istio with AKS - Canary](#istio-with-aks---canary)
+  - [Create Ingress Request](#create-ingress-request)
+  - [Stable version](#stable-version)
+  - [Canary](#canary)
+    - [Step 1: 80 / 20](#step-1-80--20)
+
+---
+
+## Create Ingress Request
 
 ```sh
 export KUBECONFIG=~/kubeconfig
 
 INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+while true; do
+  curl -ks --resolve web.local:443:$INGRESS_IP https://web.local/ >/dev/null
+  sleep 0.2
+done
+```
+
+---
+
+## Stable version
+
+```sh
+# deploy dr
+kubectll apply -f manifests/istio/canary/dr-stable.yaml
+
+kubectll apply -f manifests/istio/canary/vs-stable.yaml
 
 # Test hit the app 100x and tally versions
 sample() {
@@ -13,10 +41,7 @@ sample() {
   done | sort | uniq -c
 }
 
-while true; do
-  curl -ks --resolve web.local:443:$INGRESS_IP https://web.local/ >/dev/null
-  sleep 0.2
-done
+
 ```
 
 ---

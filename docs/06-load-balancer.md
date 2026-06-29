@@ -11,7 +11,9 @@
 ## Create and deploy new version app
 
 ```sh
-kubectl apply -f manifests/web-app/
+kubectl apply -f manifests/istio/load-balancer
+# destinationrule.networking.istio.io/web created
+# virtualservice.networking.istio.io/web configured
 
 kubectl get pods -n default -l app=web
 # NAME                      READY   STATUS    RESTARTS   AGE

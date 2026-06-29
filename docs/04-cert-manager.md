@@ -21,11 +21,20 @@ helm search repo cert-manager
 
 helm upgrade -i cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set crds.enabled=true --wait
 
+# enable sidercar injection
+kubectl label namespace cert-manager istio-injection=enabled --overwrite
+# namespace/cert-manager labeled
+
+kubectl -n cert-manager rollout restart deploy cert-manager cert-manager-cainjector cert-manager-webhook 
+# deployment.apps/cert-manager restarted
+# deployment.apps/cert-manager-cainjector restarted
+# deployment.apps/cert-manager-webhook restarted
+
 kubectl -n cert-manager get pods
 # NAME                                       READY   STATUS    RESTARTS   AGE
-# cert-manager-559776c68d-c8jqk              1/1     Running   0          47s
-# cert-manager-cainjector-7cdf9b4bd8-2rlwp   1/1     Running   0          47s
-# cert-manager-webhook-5f7fd7899-lzvnk       1/1     Running   0          47s
+# cert-manager-7b749d89f8-x8hjs              2/2     Running   0          13s
+# cert-manager-cainjector-68dc5546f8-z9vzq   2/2     Running   0          13s
+# cert-manager-webhook-6bc6b848b5-h4h75      2/2     Running   0          13s
 ```
 
 ---
