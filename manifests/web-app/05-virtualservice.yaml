@@ -17,5 +17,13 @@ spec:
       route:
         - destination:
             host: web
+            subset: v1
             port:
               number: 80
+          weight: 75
+        - destination:
+            host: web
+            subset: v2
+            port:
+              number: 80
+          weight: 25

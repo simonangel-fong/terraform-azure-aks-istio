@@ -9,7 +9,16 @@ helm repo update istio
 # ...Successfully got an update from the "istio" chart repository
 # Update Complete. ⎈Happy Helming!⎈
 
-kubectl create namespace istio-system
+helm search repo istio
+# NAME                                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+# bitnami/wavefront-adapter-for-istio     2.0.6           0.1.5           DEPRECATED Wavefront Adapter for Istio is an ad...
+# istio/istiod                            1.30.2          1.30.2          Helm chart for istio control plane                
+# istio/istiod-remote                     1.23.6          1.23.6          Helm chart for a remote cluster using an extern...
+# istio/ambient                           1.30.2          1.30.2          Helm umbrella chart for ambient                   
+# istio/base                              1.30.2          1.30.2          Helm chart for deploying Istio cluster resource...
+# istio/cni                               1.30.2          1.30.2          Helm chart for istio-cni components               
+# istio/gateway                           1.30.2          1.30.2          Helm chart for deploying Istio gateways           
+# istio/ztunnel                           1.30.2          1.30.2          Helm chart for istio ztunnel components    
 
 KUBECONFIG=./kubeconfig helm upgrade -i istio-base istio/base -n istio-system --set defaultRevision=default --wait --create-namespace
 
