@@ -1,20 +1,26 @@
+# Istio with AKS - Simple API App
 
+[Back](../README.md)
+
+- [Istio with AKS - Simple API App](#istio-with-aks---simple-api-app)
+  - [Create API Application with nginx](#create-api-application-with-nginx)
+
+---
+
+## Create API Application with nginx
 
 ```sh
 # Apply manifests
-KUBECONFIG=./kubeconfig kubectl apply -f web-app/
+kubectl apply -f manifests/web-app
 
-# Wait for rollout
-KUBECONFIG=./kubeconfig kubectl -n default rollout status deploy/web-v1
-
-# Deployment ready 2/2
-KUBECONFIG=./kubeconfig kubectl get deploy web-v1 -n default
+# confirm: ready 2/2
+kubectl get deploy web-v1 -n default
 
 # Each pod shows 2/2 containers (nginx + istio-proxy sidecar)
-KUBECONFIG=./kubeconfig kubectl get pods -n default -l app=web
+kubectl get pods -n default -l app=web
 
 # Test from inside the cluster (sidecar in the curl pod too)
-KUBECONFIG=./kubeconfig kubectl run curl --rm -it --image=curlimages/curl --restart=Never -- sh -c 'curl -s http://web/ ; echo ; curl -s http://web/healthz ; echo'
+kubectl run curl --rm -it --image=curlimages/curl --restart=Never -- sh -c 'curl -s http://web/ ; echo ; curl -s http://web/healthz ; echo'
 # {"app":"istio app","version":"1.0"}
 # ok
 
@@ -24,22 +30,22 @@ KUBECONFIG=./kubeconfig kubectl run curl --rm -it --image=curlimages/curl --rest
 
 ```sh
 # create gateway.yaml
-KUBECONFIG=./kubeconfig kubectl apply -f istio/istio-gateway/gateway.yaml
+kubectl apply -f istio/istio-gateway/gateway.yaml
 # gateway.networking.istio.io/web-gateway created
 
-KUBECONFIG=./kubeconfig kubectl apply -f istio/istio-gateway/virtualservice.yaml
+kubectl apply -f istio/istio-gateway/virtualservice.yaml
 # virtualservice.networking.istio.io/web created
 
-KUBECONFIG=./kubeconfig kubectl get gateway
+kubectl get gateway
 # NAME          AGE
 # web-gateway   24s
 
-KUBECONFIG=./kubeconfig kubectl get vs
+kubectl get vs
 # Warning: short name "vs" could also match lower priority resource volumesnapshots.snapshot.storage.k8s.io
 # NAME   GATEWAYS          HOSTS   AGE
 # web    ["web-gateway"]   ["*"]   18s
 
-INGRESS_IP=$(KUBECONFIG=./kubeconfig kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo "ingress IP: $INGRESS_IP"
 
 # test

@@ -1,3 +1,11 @@
+# Istio with AKS - Install Istio
+
+[Back](../README.md)
+
+- [Istio with AKS - Install Istio](#istio-with-aks---install-istio)
+  - [Install Istio](#install-istio)
+
+---
 
 ## Install Istio
 
@@ -10,44 +18,46 @@ helm repo update istio
 # Update Complete. ⎈Happy Helming!⎈
 
 helm search repo istio
-# NAME                                    CHART VERSION   APP VERSION     DESCRIPTION                                       
+# NAME                                    CHART VERSION   APP VERSION     DESCRIPTION
 # bitnami/wavefront-adapter-for-istio     2.0.6           0.1.5           DEPRECATED Wavefront Adapter for Istio is an ad...
-# istio/istiod                            1.30.2          1.30.2          Helm chart for istio control plane                
+# istio/istiod                            1.30.2          1.30.2          Helm chart for istio control plane
 # istio/istiod-remote                     1.23.6          1.23.6          Helm chart for a remote cluster using an extern...
-# istio/ambient                           1.30.2          1.30.2          Helm umbrella chart for ambient                   
+# istio/ambient                           1.30.2          1.30.2          Helm umbrella chart for ambient
 # istio/base                              1.30.2          1.30.2          Helm chart for deploying Istio cluster resource...
-# istio/cni                               1.30.2          1.30.2          Helm chart for istio-cni components               
-# istio/gateway                           1.30.2          1.30.2          Helm chart for deploying Istio gateways           
-# istio/ztunnel                           1.30.2          1.30.2          Helm chart for istio ztunnel components    
+# istio/cni                               1.30.2          1.30.2          Helm chart for istio-cni components
+# istio/gateway                           1.30.2          1.30.2          Helm chart for deploying Istio gateways
+# istio/ztunnel                           1.30.2          1.30.2          Helm chart for istio ztunnel components
 
-KUBECONFIG=./kubeconfig helm upgrade -i istio-base istio/base -n istio-system --set defaultRevision=default --wait --create-namespace
+# install istio base
+helm upgrade -i istio-base istio/base -n istio-system --set defaultRevision=default --wait --create-namespace
 
-KUBECONFIG=./kubeconfig helm upgrade -i istiod istio/istiod -n istio-system --wait
+# install istio istiod
+helm upgrade -i istiod istio/istiod -n istio-system --wait
 
-KUBECONFIG=./kubeconfig helm upgrade -i istio-ingressgateway istio/gateway -n istio-system -f manifests/istio-gateway/values.yaml --wait
+# install istio gateway
+helm upgrade -i istio-ingressgateway istio/gateway -n istio-system -f manifests/istio-gateway/values.yaml --wait
 
 # enable sidercar injection
-KUBECONFIG=./kubeconfig kubectl label namespace default istio-injection=enabled --overwrite
+kubectl label namespace default istio-injection=enabled --overwrite
 
 
-# confirm 
-# Control plane + gateway pods are Running
-KUBECONFIG=./kubeconfig kubectl -n istio-system get pods
+# confirm: control plane + gateway pods are Running
+kubectl -n istio-system get pods
 # NAME                                   READY   STATUS    RESTARTS   AGE
 # istio-ingressgateway-6cbc75f57-cv2q8   1/1     Running   0          7m43s
 # istiod-6fdc665455-ztgf5                1/1     Running   0          13m
 
 # Ingress LB has an external IP
-KUBECONFIG=./kubeconfig kubectl -n istio-system get svc istio-ingressgateway
+kubectl -n istio-system get svc istio-ingressgateway
 # NAME                   TYPE           CLUSTER-IP    EXTERNAL-IP     PORT(S)                                      AGE
 # istio-ingressgateway   LoadBalancer   10.0.143.10   20.121.180.84   15021:32673/TCP,80:32341/TCP,443:30841/TCP   8m42s
 
 # istioctl analyze should report no issues
-KUBECONFIG=./kubeconfig istioctl analyze -n default
+istioctl analyze -n default
 # ✔ No validation issues found when analyzing namespace: default.
 
 # Save the ingress IP for phase 04
-export INGRESS_IP=$(KUBECONFIG=./kubeconfig kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+export INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 echo "ingress IP: $INGRESS_IP"
 # ingress IP: 20.121.180.84
 

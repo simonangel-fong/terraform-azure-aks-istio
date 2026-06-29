@@ -1,14 +1,14 @@
-# Infrastructure
+# Istio with AKS - Infrastructure
 
 [Back](../README.md)
 
-- [Infrastructure](#infrastructure)
-  - [Provision Infrastructures with Terraform](#provision-infrastructures-with-terraform)
+- [Istio with AKS - Infrastructure](#istio-with-aks---infrastructure)
+  - [Terraform](#terraform)
   - [Access AKS via kubectl](#access-aks-via-kubectl)
 
 ---
 
-## Provision Infrastructures with Terraform
+## Terraform
 
 ```sh
 terraform -chdir=infra init -backend-config=backend.hcl
@@ -16,7 +16,7 @@ terraform -chdir=infra fmt && terraform -chdir=infra validate
 
 terraform -chdir=infra apply -auto-approve
 terraform -chdir=infra output kubeconfig_command
-# az aks get-credentials -g rg-aks-istio-dev -n aks-istio-dev --file ./kubeconfig --overwrite-existing      
+# az aks get-credentials -g rg-aks-istio-dev -n aks-istio-dev --file ./kubeconfig --overwrite-existing
 
 terraform -chdir=infra destroy -auto-approve
 
@@ -30,16 +30,15 @@ terraform -chdir=infra destroy -auto-approve
 az login
 
 SUB_ID=$(az account show --query id --output tsv) && echo $SUB_ID
-az account set --subscription $SUB_ID
 
 RG_NAME="rg-aks-istio-dev"
 AKS_NAME="aks-istio-dev"
 
-az aks get-credentials -g rg-aks-istio-dev -n aks-istio-dev --file ./kubeconfig --overwrite-existing
-KUBECONFIG=./kubeconfig kubectl get nodes      # node should be Ready
+export KUBECONFIG=~/kubeconfig 
+
+az aks get-credentials -g $RG_NAME -n $AKS_NAME --overwrite-existing
+kubectl get nodes
 # NAME                             STATUS   ROLES    AGE   VERSION
-# aks-system-41553657-vmss000000   Ready    <none>   51m   v1.35.5
-# aks-system-41553657-vmss000001   Ready    <none>   51m   v1.35.5
-
-
+# aks-system-33090782-vmss000000   Ready    <none>   12h   v1.35.5
+# aks-system-33090782-vmss000001   Ready    <none>   12h   v1.35.5
 ```
