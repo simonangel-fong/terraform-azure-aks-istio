@@ -25,21 +25,18 @@ kubectl get pods -n default -l app=web
 # web-v2-68cdf6746d-rxtgz   2/2     Running   0          126m
 
 # confirm
-INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+INGRESS_IP=$(kubectl -n istio-ingress get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 kubectl get destinationrule web -n default -o yaml
 # apiVersion: networking.istio.io/v1
 # kind: DestinationRule
 # metadata:
-#   annotations:
-#     kubectl.kubernetes.io/last-applied-configuration: |
-#       {"apiVersion":"networking.istio.io/v1","kind":"DestinationRule","metadata":{"annotations":{},"name":"web","namespace":"default"},"spec":{"host":"web","subsets":[{"labels":{"version":"v1"},"name":"v1"},{"labels":{"version":"v2"},"name":"v2"}]}}
-#   creationTimestamp: "2026-06-29T02:50:07Z"
+#   creationTimestamp: "2026-06-29T18:04:59Z"
 #   generation: 1
 #   name: web
 #   namespace: default
-#   resourceVersion: "195237"
-#   uid: 880a7f00-3181-4634-9fb0-3c9298378cb7
+#   resourceVersion: "20665"
+#   uid: 38f314ca-076f-4d00-86fe-f9818a78f793
 # spec:
 #   host: web
 #   subsets:

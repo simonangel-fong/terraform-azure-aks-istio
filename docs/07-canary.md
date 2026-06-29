@@ -18,7 +18,7 @@
 ```sh
 export KUBECONFIG=~/kubeconfig
 
-INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+INGRESS_IP=$(kubectl -n istio-ingress get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 while true; do
   curl -ks --resolve web.local:443:$INGRESS_IP https://web.local/ >/dev/null

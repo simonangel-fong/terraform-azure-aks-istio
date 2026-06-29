@@ -4,7 +4,7 @@
 
 - [Istio with AKS - Shadow Deployment](#istio-with-aks---shadow-deployment)
   - [Deploy Applications](#deploy-applications)
-  - [A/B Test Rollout](#ab-test-rollout)
+  - [Create Ingress Request](#create-ingress-request)
   - [Test](#test)
 
 ---
@@ -18,20 +18,21 @@ kubectl apply -f manifests/web-app/
 
 # Apply the mirror VirtualService
 kubectl apply -f manifests/istio/mirror/mirror-vs.yaml
-istioctl analyze -n default
-
 ```
 
 ---
 
-## A/B Test Rollout
+## Create Ingress Request
 
 ```sh
-# rollout
-kubectl apply -f manifests/istio/ab-test/ab-vs.yaml
-# virtualservice.networking.istio.io/web configured
+export KUBECONFIG=~/kubeconfig
 
-istioctl analyze -n default
+INGRESS_IP=$(kubectl -n istio-ingress get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+while true; do
+  curl -ks --resolve web.local:443:$INGRESS_IP https://web.local/ >/dev/null
+  sleep 0.2
+done
 ```
 
 ---
@@ -39,34 +40,21 @@ istioctl analyze -n default
 ## Test
 
 ```sh
-INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+INGRESS_IP=$(kubectl -n istio-ingress get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
-# ##############################
-# Rule 1: valid header hit v2.0
-# ##############################
-# valid header
-curl -ks -H "x-test: true" --resolve web.local:443:$INGRESS_IP https://web.local/; echo
-# {"app":"istio app","version":"2.0"}
-
-# invalid header
-curl -ks -H "x-test: nope" --resolve web.local:443:$INGRESS_IP https://web.local/; echo
-# {"app":"istio app","version":"1.0"}
-
-# valid header: 100 × v2, zero v1
-for i in $(seq 1 100); do
-  curl -ks -H "x-test: true" --resolve web.local:443:$INGRESS_IP https://web.local/
-  echo
-done | sort | uniq -c
-# 100 {"app":"istio app","version":"2.0"}
-
-# ##############################
-# Rule 2: Default split 90:10
-# ##############################
-# Default traffic: ~90 v1 / ~10 v2
+# v1: mirror is invisible
 for i in $(seq 1 100); do
   curl -ks --resolve web.local:443:$INGRESS_IP https://web.local/
   echo
 done | sort | uniq -c
-#  89 {"app":"istio app","version":"1.0"}
-#  11 {"app":"istio app","version":"2.0"}
+
+# confirm mirror by v2 log
+kubectl logs -n default -l app=web,version=v2 -c nginx -f --tail=0=0
+# 127.0.0.6 - - [29/Jun/2026:18:21:24 +0000] "GET / HTTP/1.1" 200 35 "-" "curl/8.5.0" "10.10.0.4,10.10.0.34"
+# 127.0.0.6 - - [29/Jun/2026:18:21:25 +0000] "GET / HTTP/1.1" 200 35 "-" "curl/8.5.0" "10.10.0.4,10.10.0.34"
+# 127.0.0.6 - - [29/Jun/2026:18:21:25 +0000] "GET / HTTP/1.1" 200 35 "-" "curl/8.5.0" "10.10.0.4,10.10.0.34"
+# 127.0.0.6 - - [29/Jun/2026:18:21:25 +0000] "GET / HTTP/1.1" 200 35 "-" "curl/8.5.0" "10.10.0.4,10.10.0.34"
+# 127.0.0.6 - - [29/Jun/2026:18:21:26 +0000] "GET / HTTP/1.1" 200 35 "-" "curl/8.5.0" "10.10.0.4,10.10.0.34"
+# 127.0.0.6 - - [29/Jun/2026:18:21:26 +0000] "GET / HTTP/1.1" 200 35 "-" "curl/8.5.0" "10.10.0.4,10.10.0.34"
+
 ```

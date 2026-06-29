@@ -15,6 +15,7 @@ spec:
             exact: /
         - uri:
             exact: /healthz
+      # real caller
       route:
         - destination:
             host: web
@@ -22,6 +23,7 @@ spec:
             port:
               number: 80
           weight: 100
+      # shadowing
       mirror:
         host: web
         subset: v2

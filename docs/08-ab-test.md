@@ -40,7 +40,7 @@ istioctl analyze -n default
 ## Test
 
 ```sh
-INGRESS_IP=$(kubectl -n istio-system get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+INGRESS_IP=$(kubectl -n istio-ingress get svc istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 # ##############################
 # Rule 1: valid header hit v2.0
