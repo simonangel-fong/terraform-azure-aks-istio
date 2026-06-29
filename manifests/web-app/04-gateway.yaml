@@ -7,14 +7,17 @@ spec:
   selector:
     istio: ingressgateway
   servers:
+    # http
     - port:
         number: 80
         name: http
         protocol: HTTP
       hosts:
         - "web.local"
+      # redirect
       tls:
         httpsRedirect: true
+    # https
     - port:
         number: 443
         name: https
@@ -23,4 +26,4 @@ spec:
         - "web.local"
       tls:
         mode: SIMPLE
-        credentialName: web-tls
+        credentialName: web-tls     # secret name
