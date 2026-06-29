@@ -1,10 +1,10 @@
-# Demo: Istio Key Features — Sidecar Mode
+# Demo: Istio Key Features (Sidecar Mode)
 
 A side project that explores Istio's key features on AKS: sidecar injection, ingress gateway, TLS termination, weighted load balancing, canary deployment, A/B testing, and traffic shadowing.
 
 ![Istio](https://img.shields.io/badge/Istio-7B42BC?style=for-the-badge&logo=istio&logoColor=white&style=plastic) ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white&style=plastic) ![Helm](https://img.shields.io/badge/helm-%230F1689.svg?style=for-the-badge&logo=helm&logoColor=white&style=plastic) ![Microsoft Azure](https://custom-icon-badges.demolab.com/badge/Azure%20AKS-0089D6?logo=msazure&logoColor=white&style=plastic) ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white&style=plastic)
 
-- [Demo: Istio Key Features — Sidecar Mode](#demo-istio-key-features--sidecar-mode)
+- [Demo: Istio Key Features (Sidecar Mode)](#demo-istio-key-features-sidecar-mode)
   - [Feature: Gateway API + sidecar injection](#feature-gateway-api--sidecar-injection)
   - [Feature: TLS security](#feature-tls-security)
   - [Feature: Load balancing](#feature-load-balancing)
