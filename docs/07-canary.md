@@ -1,3 +1,4 @@
+## Stable version
 
 ```sh
 export KUBECONFIG=~/kubeconfig
@@ -11,5 +12,21 @@ sample() {
     echo
   done | sort | uniq -c
 }
+
+while true; do
+  curl -ks --resolve web.local:443:$INGRESS_IP https://web.local/ >/dev/null
+  sleep 0.2
+done
+```
+
+---
+
+## Canary
+
+### Step 1: 80 / 20
+
+```sh
+kubectl apply -f manifests/canary/step1-80-20.yaml
+# virtualservice.networking.istio.io/web configured
 
 ```

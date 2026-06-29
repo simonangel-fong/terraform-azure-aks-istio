@@ -1,3 +1,4 @@
+# 50:50(v1:v2)
 apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
@@ -20,10 +21,10 @@ spec:
             subset: v1
             port:
               number: 80
-          weight: 80
+          weight: 50
         - destination:
             host: web
             subset: v2
             port:
               number: 80
-          weight: 20
+          weight: 50
