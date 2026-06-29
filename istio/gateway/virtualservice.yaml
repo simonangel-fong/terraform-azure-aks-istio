@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: web
+  namespace: default
+spec:
+  hosts:
+    - "web.local"
+  gateways:
+    - web-gateway
+  http:
+    - match:
+        - uri:
+            exact: /
+        - uri:
+            exact: /healthz
+      route:
+        - destination:
+            host: web
+            port:
+              number: 80

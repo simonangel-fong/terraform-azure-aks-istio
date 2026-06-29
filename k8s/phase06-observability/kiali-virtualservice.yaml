@@ -1,0 +1,51 @@
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: kiali-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 443
+        name: https-kiali
+        protocol: HTTPS
+      hosts:
+        - "kiali.local"
+      tls:
+        mode: SIMPLE
+        credentialName: kiali-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kiali-tls
+  namespace: istio-system
+spec:
+  secretName: kiali-tls
+  duration: 2160h
+  renewBefore: 360h
+  commonName: kiali.local
+  dnsNames:
+    - kiali.local
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: kiali
+  namespace: istio-system
+spec:
+  hosts:
+    - "kiali.local"
+  gateways:
+    - kiali-gateway
+  http:
+    - route:
+        - destination:
+            host: kiali.istio-system.svc.cluster.local
+            port:
+              number: 20001

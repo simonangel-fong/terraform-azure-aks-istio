@@ -15,8 +15,11 @@ terraform -chdir=infra init -backend-config=backend.hcl
 terraform -chdir=infra fmt && terraform -chdir=infra validate
 
 terraform -chdir=infra apply -auto-approve
+terraform -chdir=infra output kubeconfig_command
+# az aks get-credentials -g rg-aks-istio-dev -n aks-istio-dev --file ./kubeconfig --overwrite-existing      
 
 terraform -chdir=infra destroy -auto-approve
+
 ```
 
 ---
@@ -34,8 +37,9 @@ AKS_NAME="aks-istio-dev"
 
 az aks get-credentials -g rg-aks-istio-dev -n aks-istio-dev --file ./kubeconfig --overwrite-existing
 KUBECONFIG=./kubeconfig kubectl get nodes      # node should be Ready
+# NAME                             STATUS   ROLES    AGE   VERSION
+# aks-system-41553657-vmss000000   Ready    <none>   51m   v1.35.5
+# aks-system-41553657-vmss000001   Ready    <none>   51m   v1.35.5
 
-kubectl get node
-# NAME                              STATUS   ROLES    AGE     VERSION
-# aks-general-21123181-vmss000000   Ready    <none>   3m50s   v1.35.5
+
 ```
